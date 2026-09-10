@@ -1,12 +1,3103 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="refresh" content="0;url=Html.html">
-    <title>Redirecting…</title>
-    <script>location.replace('Html.html');</script>
-  </head>
-  <body>
-    If you are not redirected, <a href="Html.html">click here to open the page</a>.
-  </body>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Astral Pathstrider — คลาส Homebrew สำหรับ D&D 5e</title>
+
+  <style>
+    /* =========================================================
+       ASTRAL PATHSTRIDER — DOCUMENT THEME
+       ใช้ฟอนต์จากเครื่อง จึงเปิดอ่านแบบออฟไลน์ได้
+       ========================================================= */
+
+    :root {
+      --background: #f3f1ec;
+      --surface: #ffffff;
+      --surface-soft: #f8f7f4;
+      --surface-accent: #eee9ff;
+      --text: #272536;
+      --text-soft: #666276;
+      --heading: #282052;
+      --primary: #6350a4;
+      --primary-dark: #49377f;
+      --secondary: #b88934;
+      --border: #d9d4e2;
+      --danger: #9f3a4d;
+      --success: #31745b;
+      --shadow: 0 10px 30px rgba(34, 27, 70, 0.08);
+      --radius: 16px;
+      --content-width: 1180px;
+    }
+
+    body.dark {
+      --background: #17151f;
+      --surface: #221f2d;
+      --surface-soft: #2a2636;
+      --surface-accent: #30284c;
+      --text: #eeeaf7;
+      --text-soft: #c2bbd0;
+      --heading: #ffffff;
+      --primary: #ab94ff;
+      --primary-dark: #c8b9ff;
+      --secondary: #e4ba62;
+      --border: #464054;
+      --danger: #ff9cad;
+      --success: #84d6b4;
+      --shadow: 0 12px 34px rgba(0, 0, 0, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, rgba(99, 80, 164, 0.11), transparent 32rem),
+        var(--background);
+      color: var(--text);
+      font-family:
+        "Noto Sans Thai",
+        "Sarabun",
+        "Tahoma",
+        "Segoe UI",
+        sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 66px;
+      padding: 10px max(18px, calc((100vw - var(--content-width)) / 2));
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      min-width: 0;
+      color: var(--heading);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--text-soft);
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .toolbar button {
+      min-height: 40px;
+      padding: 7px 12px;
+      color: var(--text);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover {
+      color: var(--heading);
+      border-color: var(--primary);
+    }
+
+    .page-layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 28px;
+      width: min(var(--content-width), calc(100% - 32px));
+      margin: 28px auto 72px;
+    }
+
+    .sidebar {
+      align-self: start;
+      position: sticky;
+      top: 92px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar h2 {
+      margin: 0 0 12px;
+      color: var(--heading);
+      font-size: 1rem;
+    }
+
+    .sidebar nav {
+      display: grid;
+      gap: 3px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 7px 10px;
+      color: var(--text-soft);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .sidebar a:hover {
+      color: var(--heading);
+      background: var(--surface-accent);
+      text-decoration: none;
+    }
+
+    .sidebar .sub-link {
+      padding-left: 24px;
+      font-size: 0.83rem;
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(32px, 7vw, 72px);
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 82% 20%, rgba(255, 221, 151, 0.33), transparent 16rem),
+        linear-gradient(135deg, #241c50, #554095 58%, #8d679d);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "✦";
+      position: absolute;
+      right: 7%;
+      bottom: -12%;
+      color: rgba(255, 255, 255, 0.09);
+      font-size: clamp(9rem, 24vw, 18rem);
+      line-height: 1;
+      transform: rotate(12deg);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #f4d994;
+      font-size: 0.86rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.2rem, 7vw, 5rem);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .hero h2 {
+      position: relative;
+      z-index: 1;
+      margin: 12px 0 0;
+      color: #eee8ff;
+      font-size: clamp(1.15rem, 3vw, 1.8rem);
+      font-weight: 500;
+    }
+
+    .hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 24px 0 0;
+      color: #f6f2ff;
+      font-size: 1.05rem;
+    }
+
+    .hero-meta {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 26px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 4px 11px;
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      font-size: 0.85rem;
+    }
+
+    section {
+      margin-top: 28px;
+      padding: clamp(20px, 4vw, 36px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    section > h2 {
+      margin: 0 0 20px;
+      padding-bottom: 12px;
+      color: var(--heading);
+      border-bottom: 2px solid var(--secondary);
+      font-size: clamp(1.45rem, 3vw, 2rem);
+      line-height: 1.25;
+    }
+
+    h3 {
+      margin: 28px 0 10px;
+      color: var(--heading);
+      font-size: 1.25rem;
+      line-height: 1.35;
+    }
+
+    h4 {
+      margin: 22px 0 8px;
+      color: var(--primary-dark);
+      font-size: 1.05rem;
+    }
+
+    p {
+      margin: 0 0 15px;
+    }
+
+    strong {
+      color: var(--heading);
+    }
+
+    .lead {
+      color: var(--text-soft);
+      font-size: 1.06rem;
+    }
+
+    .quote {
+      margin: 20px 0;
+      padding: 18px 22px;
+      color: var(--heading);
+      background: var(--surface-accent);
+      border-left: 5px solid var(--secondary);
+      border-radius: 0 12px 12px 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.08rem;
+      font-style: italic;
+    }
+
+    .callout {
+      margin: 18px 0;
+      padding: 16px 18px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      border-radius: 10px;
+    }
+
+    .callout.warning {
+      border-left-color: var(--danger);
+    }
+
+    .callout.success {
+      border-left-color: var(--success);
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .info-card {
+      padding: 16px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .info-card h3,
+    .info-card h4 {
+      margin-top: 0;
+    }
+
+    .info-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .stat-line {
+      margin-bottom: 8px;
+    }
+
+    .stat-line:last-child {
+      margin-bottom: 0;
+    }
+
+    .stat-label {
+      color: var(--heading);
+      font-weight: 750;
+    }
+
+    .table-wrap {
+      width: 100%;
+      margin: 18px 0;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      font-size: 0.92rem;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #ffffff;
+      background: var(--primary-dark);
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--surface-soft);
+    }
+
+    .number {
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .formula {
+      display: block;
+      margin: 10px 0;
+      padding: 12px 14px;
+      color: var(--heading);
+      background: var(--surface-accent);
+      border-radius: 10px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.94rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .resource-track {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 18px;
+    }
+
+    .resource-box {
+      display: inline-grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: var(--heading);
+      background: var(--surface-soft);
+      border: 2px solid var(--primary);
+      border-radius: 50%;
+      font-weight: 800;
+    }
+
+    details {
+      margin: 14px 0;
+      overflow: hidden;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    summary {
+      padding: 15px 18px;
+      color: var(--heading);
+      background: var(--surface-accent);
+      cursor: pointer;
+      font-size: 1.02rem;
+      font-weight: 800;
+    }
+
+    summary:hover {
+      color: var(--primary-dark);
+    }
+
+    .details-body {
+      padding: 4px 18px 18px;
+    }
+
+    .feature {
+      margin: 18px 0;
+      padding-left: 16px;
+      border-left: 3px solid var(--secondary);
+    }
+
+    .feature h4 {
+      margin: 0 0 6px;
+    }
+
+    .feature .level {
+      color: var(--text-soft);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .feature p:last-child {
+      margin-bottom: 0;
+    }
+
+    .path-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .path-icon {
+      display: inline-grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      color: #ffffff;
+      background: var(--primary);
+      border-radius: 50%;
+      font-size: 1.15rem;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+    }
+
+    .check-item::before {
+      content: "✦";
+      flex: 0 0 auto;
+      color: var(--secondary);
+      font-weight: 900;
+    }
+
+    .sheet {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .field {
+      min-height: 70px;
+      padding: 12px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .field.large {
+      grid-column: 1 / -1;
+      min-height: 110px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 18px;
+      color: var(--heading);
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .write-line {
+      display: block;
+      border-bottom: 1px solid var(--text-soft);
+    }
+
+    .footer {
+      margin-top: 28px;
+      padding: 24px;
+      color: var(--text-soft);
+      text-align: center;
+      font-size: 0.88rem;
+    }
+
+    .back-to-top {
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 920px) {
+      .page-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        max-height: none;
+      }
+
+      .sidebar nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .sidebar .sub-link {
+        padding-left: 10px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        font-size: 15px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .toolbar button {
+        min-height: 36px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+
+      .page-layout {
+        width: min(100% - 20px, var(--content-width));
+        margin-top: 12px;
+      }
+
+      .grid,
+      .grid.three,
+      .sheet {
+        grid-template-columns: 1fr;
+      }
+
+      .field.large {
+        grid-column: auto;
+      }
+
+      .sidebar nav {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 18px;
+      }
+    }
+
+    /* =========================================================
+       PRINT / PDF
+       ========================================================= */
+
+    @media print {
+      :root {
+        --background: #ffffff;
+        --surface: #ffffff;
+        --surface-soft: #f6f6f6;
+        --surface-accent: #eeeaf8;
+        --text: #111111;
+        --text-soft: #444444;
+        --heading: #21194c;
+        --primary: #54418e;
+        --primary-dark: #3a2d68;
+        --secondary: #9b7024;
+        --border: #cccccc;
+        --shadow: none;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      body {
+        background: #ffffff;
+        font-size: 10.5pt;
+      }
+
+      .topbar,
+      .sidebar,
+      .footer,
+      .no-print {
+        display: none !important;
+      }
+
+      .page-layout {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
+
+      .hero {
+        min-height: 240px;
+        border-radius: 0;
+        break-after: page;
+      }
+
+      section {
+        margin: 0 0 16px;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      section.major-section {
+        break-before: page;
+      }
+
+      h2,
+      h3,
+      h4,
+      summary {
+        break-after: avoid;
+      }
+
+      p,
+      .feature,
+      .info-card,
+      tr {
+        break-inside: avoid;
+      }
+
+      details {
+        overflow: visible;
+        background: transparent;
+        border: 0;
+      }
+
+      details > summary {
+        padding: 10px 0;
+        background: transparent;
+        border-bottom: 2px solid var(--secondary);
+        list-style: none;
+      }
+
+      details > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      details:not([open]) > .details-body {
+        display: block !important;
+      }
+
+      .details-body {
+        padding: 0;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
+</head>
+
+<body id="top">
+
+  <header class="topbar">
+    <div class="brand">
+      ASTRAL PATHSTRIDER
+      <small>คลาส Homebrew สำหรับ Dungeons & Dragons 5e</small>
+    </div>
+
+    <div class="toolbar no-print">
+      <button type="button" onclick="toggleTheme()">◐ สลับสี</button>
+      <button type="button" onclick="setAllDetails(true)">＋ เปิดทั้งหมด</button>
+      <button type="button" onclick="setAllDetails(false)">− ปิดทั้งหมด</button>
+      <button type="button" onclick="window.print()">⎙ พิมพ์ / PDF</button>
+    </div>
+  </header>
+
+  <div class="page-layout">
+
+    <aside class="sidebar" aria-label="สารบัญ">
+      <h2>สารบัญ</h2>
+      <nav>
+        <a href="#overview">1. ภาพรวมคลาส</a>
+        <a href="#creation">2. การสร้างตัวละคร</a>
+        <a href="#class-table">3. ตารางระดับคลาส</a>
+        <a href="#combat-cycle">4. ระบบ Combat Cycle</a>
+        <a href="#class-features">5. ความสามารถประจำคลาส</a>
+        <a href="#paths">6. วิถีแห่งดวงดาว</a>
+        <a class="sub-link" href="#destruction">Destruction</a>
+        <a class="sub-link" href="#hunt">The Hunt</a>
+        <a class="sub-link" href="#erudition">Erudition</a>
+        <a class="sub-link" href="#harmony">Harmony</a>
+        <a class="sub-link" href="#nihility">Nihility</a>
+        <a class="sub-link" href="#preservation">Preservation</a>
+        <a class="sub-link" href="#abundance">Abundance</a>
+        <a class="sub-link" href="#remembrance">Remembrance</a>
+        <a href="#traces">7. Traces</a>
+        <a href="#multiclass">8. Multiclass</a>
+        <a href="#examples">9. ตัวอย่างการเล่น</a>
+        <a href="#balance">10. แนวทางทดสอบสมดุล</a>
+        <a href="#quick-reference">11. สรุปกฎฉบับรวดเร็ว</a>
+        <a href="#character-record">12. ช่องบันทึกตัวละคร</a>
+      </nav>
+    </aside>
+
+    <main>
+
+      <article class="hero">
+        <p class="eyebrow">Dungeons &amp; Dragons 5th Edition Homebrew</p>
+        <h1>Astral Pathstrider</h1>
+        <h2>ผู้ก้าววิถีดารา</h2>
+
+        <p>
+          คลาสนักต่อสู้ผู้เชื่อมโยงกับเจตจำนงแห่งดวงดาว
+          ออกแบบสำหรับตัวละคร OC และเน้นวงจรการต่อสู้แบบ
+          Basic Command → Skill → Energy → Ultimate
+        </p>
+
+        <div class="hero-meta">
+          <span class="tag">ฉบับผู้เล่น 1.0</span>
+          <span class="tag">Hit Die d8</span>
+          <span class="tag">8 Astral Paths</span>
+          <span class="tag">ระดับ 1–20</span>
+          <span class="tag">เน้น Tactical Play</span>
+        </div>
+      </article>
+
+      <section id="overview">
+        <h2>1. ภาพรวมคลาส</h2>
+
+        <div class="quote">
+          “ทุกชีวิตมีวิถีของตนเอง และทุกการตัดสินใจย่อมทิ้งร่องรอยไว้ท่ามกลางหมู่ดาว”
+        </div>
+
+        <p class="lead">
+          ผู้ก้าววิถีดาราคือนักผจญภัยที่เชื่อมโยงกับแนวคิด เจตจำนง
+          หรือพลังบางอย่างซึ่งยิ่งใหญ่เกินกว่าบุคคลธรรมดา
+          พลังของพวกเขาอาจปรากฏเป็นอาวุธล้ำยุค เวทมนตร์ ดนตรี
+          วิญญาณ สิ่งประดิษฐ์ ความทรงจำ หรือปรากฏการณ์เหนือธรรมชาติ
+        </p>
+
+        <p>
+          ผู้เล่นสามารถออกแบบรูปลักษณ์ของอาวุธ Skill, Ultimate และ Talent
+          ให้เข้ากับตัวละคร OC ได้อย่างอิสระ รูปลักษณ์และชื่อของความสามารถ
+          ไม่มีผลต่อกฎ ตราบใดที่ระยะ เป้าหมาย ความเสียหาย และเงื่อนไขเดิมไม่เปลี่ยน
+        </p>
+
+        <div class="grid">
+          <div class="info-card">
+            <h3>รูปแบบการเล่น</h3>
+            <p>
+              สลับระหว่าง Basic Command เพื่อฟื้นทรัพยากร ใช้ Skill เพื่อสร้างผลกระทบ
+              ที่รุนแรงขึ้น และสะสม Energy เพื่อเปิดใช้ Ultimate ในจังหวะสำคัญ
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>บทบาทในปาร์ตี้</h3>
+            <p>
+              บทบาทขึ้นอยู่กับวิถีที่เลือก ตั้งแต่ผู้สร้างความเสียหายเป้าหมายเดี่ยว
+              ผู้โจมตีหมู่ ซัพพอร์ต ดีบัฟ แทงก์ ฮีลเลอร์ ไปจนถึงผู้ใช้สิ่งอัญเชิญ
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>ระดับความซับซ้อน</h3>
+            <p>
+              ปานกลางถึงสูง เหมาะกับผู้เล่นที่สนุกกับการบริหารทรัพยากร
+              การจัดลำดับ Action และการวางแผนล่วงหน้าหลายรอบ
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>เป้าหมายด้านสมดุล</h3>
+            <p>
+              ตั้งใจให้อยู่ใกล้เคียง Battle Master Fighter, Artificer และ Warlock
+              คือมีตัวเลือกมากและสร้างจังหวะเด่นได้ แต่ไม่เหนือกว่าคลาสเฉพาะทางทุกด้าน
+            </p>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <p>
+            <strong>หมายเหตุ:</strong> เนื้อหานี้เป็น Homebrew ที่ไม่เป็นทางการ
+            และไม่ได้รับการรับรองจากผู้จัดจำหน่าย Dungeons &amp; Dragons
+            ผู้เล่นควรได้รับอนุญาตจาก Dungeon Master ก่อนนำไปใช้
+          </p>
+        </div>
+
+        <h3>คุณสมบัติพื้นฐาน</h3>
+
+        <div class="grid">
+          <div class="info-card">
+            <p class="stat-line"><span class="stat-label">Hit Die:</span> 1d8 ต่อระดับผู้ก้าววิถีดารา</p>
+            <p class="stat-line"><span class="stat-label">HP ระดับ 1:</span> 8 + Constitution modifier</p>
+            <p class="stat-line"><span class="stat-label">HP ระดับถัดไป:</span> 1d8 หรือ 5 + Constitution modifier ต่อระดับ</p>
+          </div>
+
+          <div class="info-card">
+            <p class="stat-line"><span class="stat-label">เกราะ:</span> เกราะเบาและเกราะกลาง</p>
+            <p class="stat-line"><span class="stat-label">อาวุธ:</span> อาวุธธรรมดาทั้งหมด และ Martial Weapon 1 ชนิด</p>
+            <p class="stat-line"><span class="stat-label">Saving Throws:</span> Constitution และ Intelligence</p>
+          </div>
+        </div>
+
+        <h3>ทักษะ</h3>
+
+        <p>
+          เลือกทักษะสามอย่างจาก Acrobatics, Arcana, Athletics, Insight,
+          Investigation, Medicine, Perception, Performance, Persuasion และ Survival
+        </p>
+
+        <h3>อุปกรณ์เริ่มต้น</h3>
+
+        <p>
+          คุณเริ่มต้นด้วยเกราะหนังหรือ Scale Mail, อาวุธธรรมดาหนึ่งชิ้น,
+          Explorer’s Pack และสิ่งของหนึ่งชิ้นที่ทำหน้าที่เป็นตัวกลางพลังของตัวละคร
+          เช่น จี้ หนังสือ เครื่องดนตรี อุปกรณ์สื่อสาร โดรน หรือแกนพลังงาน
+        </p>
+      </section>
+
+      <section id="creation">
+        <h2>2. การสร้างตัวละคร</h2>
+
+        <h3>กำหนดต้นกำเนิดพลัง</h3>
+
+        <p>
+          พลังของตัวละครอาจมาจากพันธสัญญากับสิ่งเหนือธรรมชาติ
+          การทดลองทางวิทยาศาสตร์ มรดกทางสายเลือด ความทรงจำจากอดีต
+          เทคโนโลยีจากอารยธรรมที่สูญหาย หรือเจตจำนงที่แข็งแกร่งเป็นพิเศษ
+        </p>
+
+        <h3>เลือก Resonance Ability</h3>
+
+        <p>
+          เมื่อได้รับคลาสนี้ที่ระดับ 1 ให้เลือก Intelligence, Wisdom หรือ Charisma
+          เป็น Resonance Ability ตัวเลือกนี้แสดงถึงวิธีที่ตัวละครควบคุมพลัง
+          และไม่สามารถเปลี่ยนภายหลัง เว้นแต่ Dungeon Master จะอนุญาต
+        </p>
+
+        <div class="grid three">
+          <div class="info-card">
+            <h4>Intelligence</h4>
+            <p>
+              เหมาะกับนักวิจัย นักวางแผน นักประดิษฐ์ ผู้ใช้เทคโนโลยี
+              หรือผู้ควบคุมพลังผ่านการคำนวณ
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h4>Wisdom</h4>
+            <p>
+              เหมาะกับผู้มีสัญชาตญาณ ผู้ใช้พลังจิต
+              หรือผู้เชื่อมโยงกับธรรมชาติ วิญญาณ และความทรงจำ
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h4>Charisma</h4>
+            <p>
+              เหมาะกับผู้นำ ศิลปิน หรือผู้ใช้พลังผ่านบุคลิก
+              ความรู้สึก คำมั่นสัญญา และเจตจำนง
+            </p>
+          </div>
+        </div>
+
+        <span class="formula">
+          Skill Save DC = 8 + Proficiency Bonus + Resonance Ability modifier
+        </span>
+
+        <span class="formula">
+          Skill Attack Modifier = Proficiency Bonus + Resonance Ability modifier
+        </span>
+
+        <h3>ออกแบบ Resonant Armament</h3>
+
+        <p>
+          Resonant Armament อาจมีรูปลักษณ์เป็นดาบ ปืน หอก ไพ่ พัด โดรน
+          หนังสือ เครื่องดนตรี ถุงมือ หรือพลังที่ยิงออกจากร่างกาย
+          รูปลักษณ์ไม่มีผลต่อค่าสถานะของอาวุธ
+        </p>
+
+        <h3>เลือกวิถี</h3>
+
+        <p>
+          เลือกวิถีตามบทบาทที่ต้องการ ไม่จำเป็นต้องตรงกับบุคลิกของตัวละคร
+          ตัวละครผู้ใจดีอาจเดินตามวิถี Destruction
+          ส่วนตัวละครผู้เย็นชาอาจใช้วิถี Abundance ได้
+        </p>
+
+        <h3>ตั้งชื่อความสามารถ</h3>
+
+        <p>
+          คุณสามารถเปลี่ยนชื่อและคำบรรยายของ Skill, Ultimate และ Talent
+          ได้อย่างอิสระ ตราบใดที่ไม่เปลี่ยนผลทางกลไก
+          ควรตกลงกับ DM เรื่องรูปแบบเทคโนโลยีและระดับความเหมาะสมกับโลกของแคมเปญ
+        </p>
+      </section>
+
+      <section id="class-table" class="major-section">
+        <h2>3. ตารางระดับคลาส</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="number">ระดับ</th>
+                <th class="number">PB</th>
+                <th>ความสามารถ</th>
+                <th class="number">Resonance Die</th>
+                <th class="number">Traces</th>
+                <th class="number">Skill Points</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td class="number">1</td>
+                <td class="number">+2</td>
+                <td>Resonant Armament, Combat Cycle, Astral Path, Skill, Ultimate</td>
+                <td class="number">d6</td>
+                <td class="number">0</td>
+                <td class="number">2</td>
+              </tr>
+              <tr>
+                <td class="number">2</td>
+                <td class="number">+2</td>
+                <td>Traces</td>
+                <td class="number">d6</td>
+                <td class="number">2</td>
+                <td class="number">2</td>
+              </tr>
+              <tr>
+                <td class="number">3</td>
+                <td class="number">+2</td>
+                <td>Path Talent</td>
+                <td class="number">d6</td>
+                <td class="number">2</td>
+                <td class="number">2</td>
+              </tr>
+              <tr>
+                <td class="number">4</td>
+                <td class="number">+2</td>
+                <td>Ability Score Improvement</td>
+                <td class="number">d6</td>
+                <td class="number">2</td>
+                <td class="number">2</td>
+              </tr>
+              <tr>
+                <td class="number">5</td>
+                <td class="number">+3</td>
+                <td>Extra Attack, Skill Follow-Up</td>
+                <td class="number">d8</td>
+                <td class="number">2</td>
+                <td class="number">3</td>
+              </tr>
+              <tr>
+                <td class="number">6</td>
+                <td class="number">+3</td>
+                <td>Magical Armament, Trace เพิ่ม</td>
+                <td class="number">d8</td>
+                <td class="number">3</td>
+                <td class="number">3</td>
+              </tr>
+              <tr>
+                <td class="number">7</td>
+                <td class="number">+3</td>
+                <td>Path Advancement</td>
+                <td class="number">d8</td>
+                <td class="number">3</td>
+                <td class="number">3</td>
+              </tr>
+              <tr>
+                <td class="number">8</td>
+                <td class="number">+3</td>
+                <td>Ability Score Improvement</td>
+                <td class="number">d8</td>
+                <td class="number">3</td>
+                <td class="number">3</td>
+              </tr>
+              <tr>
+                <td class="number">9</td>
+                <td class="number">+4</td>
+                <td>Skill Amplification</td>
+                <td class="number">d8</td>
+                <td class="number">3</td>
+                <td class="number">4</td>
+              </tr>
+              <tr>
+                <td class="number">10</td>
+                <td class="number">+4</td>
+                <td>Trace เพิ่ม</td>
+                <td class="number">d8</td>
+                <td class="number">4</td>
+                <td class="number">4</td>
+              </tr>
+              <tr>
+                <td class="number">11</td>
+                <td class="number">+4</td>
+                <td>Resonant Impact</td>
+                <td class="number">d10</td>
+                <td class="number">4</td>
+                <td class="number">4</td>
+              </tr>
+              <tr>
+                <td class="number">12</td>
+                <td class="number">+4</td>
+                <td>Ability Score Improvement</td>
+                <td class="number">d10</td>
+                <td class="number">4</td>
+                <td class="number">4</td>
+              </tr>
+              <tr>
+                <td class="number">13</td>
+                <td class="number">+5</td>
+                <td>Energy Overflow</td>
+                <td class="number">d10</td>
+                <td class="number">4</td>
+                <td class="number">5</td>
+              </tr>
+              <tr>
+                <td class="number">14</td>
+                <td class="number">+5</td>
+                <td>Trace เพิ่ม</td>
+                <td class="number">d10</td>
+                <td class="number">5</td>
+                <td class="number">5</td>
+              </tr>
+              <tr>
+                <td class="number">15</td>
+                <td class="number">+5</td>
+                <td>Path Apex</td>
+                <td class="number">d10</td>
+                <td class="number">5</td>
+                <td class="number">5</td>
+              </tr>
+              <tr>
+                <td class="number">16</td>
+                <td class="number">+5</td>
+                <td>Ability Score Improvement</td>
+                <td class="number">d10</td>
+                <td class="number">5</td>
+                <td class="number">5</td>
+              </tr>
+              <tr>
+                <td class="number">17</td>
+                <td class="number">+6</td>
+                <td>Skill Mastery</td>
+                <td class="number">d12</td>
+                <td class="number">5</td>
+                <td class="number">6</td>
+              </tr>
+              <tr>
+                <td class="number">18</td>
+                <td class="number">+6</td>
+                <td>Trace เพิ่ม</td>
+                <td class="number">d12</td>
+                <td class="number">6</td>
+                <td class="number">6</td>
+              </tr>
+              <tr>
+                <td class="number">19</td>
+                <td class="number">+6</td>
+                <td>Ability Score Improvement หรือ Feat</td>
+                <td class="number">d12</td>
+                <td class="number">6</td>
+                <td class="number">6</td>
+              </tr>
+              <tr>
+                <td class="number">20</td>
+                <td class="number">+6</td>
+                <td>Emanator’s Awakening</td>
+                <td class="number">d12</td>
+                <td class="number">6</td>
+                <td class="number">6</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="combat-cycle">
+        <h2>4. ระบบ Combat Cycle</h2>
+
+        <p class="lead">
+          ผู้ก้าววิถีดาราใช้ทรัพยากรสองประเภท ได้แก่ Skill Points และ Energy
+          ทรัพยากรทั้งสองทำหน้าที่ต่างกันและต้องบันทึกแยกจากกัน
+        </p>
+
+        <div class="grid">
+          <div class="info-card">
+            <h3>Skill Points</h3>
+            <p>
+              ใช้เพื่อเปิดใช้งาน Skill ประจำวิถี จำนวนสูงสุดแสดงในตารางระดับคลาส
+              Skill โดยทั่วไปใช้ Skill Point 1 หน่วย
+            </p>
+
+            <p>
+              เมื่อ Basic Command โจมตีโดนอย่างน้อยหนึ่งครั้ง
+              คุณฟื้น Skill Point 1 หน่วย ผลนี้เกิดได้ไม่เกินหนึ่งครั้งต่อเทิร์น
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Energy</h3>
+            <p>
+              ใช้เพื่อเปิดใช้งาน Ultimate คุณมี Energy ได้สูงสุด 5 หน่วย
+              และต้องใช้ Energy ครบ 5 หน่วยเพื่อใช้ Ultimate
+            </p>
+
+            <div class="resource-track" aria-label="Energy tracker">
+              <span class="resource-box">1</span>
+              <span class="resource-box">2</span>
+              <span class="resource-box">3</span>
+              <span class="resource-box">4</span>
+              <span class="resource-box">5</span>
+            </div>
+          </div>
+        </div>
+
+        <h3>การเริ่มการต่อสู้</h3>
+
+        <p>
+          เมื่อทอย Initiative เพื่อต่อสู้กับภัยคุกคามจริง Skill Points
+          ของคุณจะกลับมาเต็ม หากมี Energy ต่ำกว่า 2 หน่วย ให้เพิ่มเป็น 2 หน่วย
+          ตั้งแต่ระดับ 13 เป็นต้นไป คุณจะเริ่มด้วย Energy อย่างน้อย 3 หน่วยแทน
+        </p>
+
+        <h3>การพักและการสิ้นสุดการต่อสู้</h3>
+
+        <p>
+          Skill Points กลับมาเต็มเมื่อจบ Short Rest หรือ Long Rest
+          ส่วน Energy ทั้งหมดจะหายไปเมื่อไม่มีภัยคุกคามเป็นเวลาอย่างน้อย 1 นาที
+        </p>
+
+        <div class="callout warning">
+          <p>
+            <strong>ป้องกันการฟาร์มทรัพยากร:</strong>
+            การโจมตีสิ่งของ พันธมิตร หรือสิ่งมีชีวิตที่สมัครใจให้โจมตี
+            จะไม่สร้าง Energy และไม่ฟื้น Skill Point
+          </p>
+        </div>
+
+        <details open>
+          <summary>Basic Command</summary>
+          <div class="details-body">
+            <p>
+              เมื่อใช้ Attack action และโจมตีด้วย Resonant Armament อย่างน้อยหนึ่งครั้ง
+              ถือว่าคุณใช้ Basic Command
+            </p>
+
+            <p>
+              หากการโจมตีอย่างน้อยหนึ่งครั้งโดนเป้าหมาย
+              คุณได้รับ Energy 1 หน่วยและฟื้น Skill Point 1 หน่วย
+              ผลนี้เกิดได้ไม่เกินหนึ่งครั้งต่อเทิร์น
+              ไม่ว่าคุณจะโจมตีโดนกี่ครั้งก็ตาม
+            </p>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Skill Command</summary>
+          <div class="details-body">
+            <p>
+              ใช้ Action และ Skill Point 1 หน่วยเพื่อเปิดใช้งาน Skill ประจำวิถี
+              หลังจาก Skill ทำงานเสร็จ คุณได้รับ Energy 2 หน่วย
+              แม้การโจมตีจะพลาดหรือเป้าหมายจะผ่าน Saving Throw
+            </p>
+
+            <p>
+              ตั้งแต่ระดับ 5 เป็นต้นไป หลังใช้ Skill คุณโจมตีด้วย Resonant Armament
+              ได้หนึ่งครั้ง การโจมตีเพิ่มเติมนี้ไม่สร้าง Energy และไม่ฟื้น Skill Point
+            </p>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Ultimate</summary>
+          <div class="details-body">
+            <p>
+              เมื่อมี Energy ครบ 5 หน่วย คุณสามารถใช้ Energy ทั้งหมด
+              เพื่อเปิดใช้งาน Ultimate ประจำวิถี Ultimate ไม่ใช้ Skill Point
+              และใช้งานได้ไม่เกินหนึ่งครั้งต่อรอบ
+            </p>
+
+            <p>
+              คุณสามารถใช้ Ultimate เป็น Bonus Action ในเทิร์นของตัวเอง
+              หรือใช้เป็น Reaction หลังจากสิ่งมีชีวิตใดก็ตามจบเทิร์น
+              หากใช้เป็น Reaction คุณยังคงมี Reaction เพียงหนึ่งครั้งตามกฎปกติ
+            </p>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Path Talent และข้อจำกัดการสร้าง Energy</summary>
+          <div class="details-body">
+            <p>
+              Talent ของแต่ละวิถีจะกำหนดเงื่อนไขเฉพาะสำหรับสร้าง Energy เพิ่ม
+              ไม่ว่าเงื่อนไขจะเกิดขึ้นกี่ครั้ง คุณสามารถได้รับ Energy จาก Path Talent
+              ได้ไม่เกิน 1 หน่วยต่อรอบ
+            </p>
+          </div>
+        </details>
+
+        <h3>Resonance Die</h3>
+
+        <p>
+          ความสามารถหลายอย่างใช้ลูกเต๋าที่เรียกว่า Resonance Die
+          ขนาดของลูกเต๋าจะเพิ่มขึ้นตามระดับคลาส
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ระดับคลาส</th>
+                <th>Resonance Die</th>
+                <th>ตัวอย่าง 3 Resonance Dice</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ระดับ 1–4</td>
+                <td>d6</td>
+                <td>3d6</td>
+              </tr>
+              <tr>
+                <td>ระดับ 5–10</td>
+                <td>d8</td>
+                <td>3d8</td>
+              </tr>
+              <tr>
+                <td>ระดับ 11–16</td>
+                <td>d10</td>
+                <td>3d10</td>
+              </tr>
+              <tr>
+                <td>ระดับ 17–20</td>
+                <td>d12</td>
+                <td>3d12</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="class-features" class="major-section">
+        <h2>5. ความสามารถประจำคลาส</h2>
+
+        <div class="feature">
+          <span class="level">ระดับ 1</span>
+          <h4>Resonant Armament</h4>
+
+          <p>
+            คุณสามารถสร้างอาวุธประจำตัวที่เรียกว่า Resonant Armament
+            เมื่อได้รับความสามารถนี้ ให้เลือกว่าอาวุธเป็นอาวุธประชิดระยะ 5 ฟุต
+            หรืออาวุธระยะไกลที่มีระยะปกติ 60 ฟุตและระยะไกล 180 ฟุต
+          </p>
+
+          <p>
+            อาวุธสร้างความเสียหาย 1d8 ให้เลือกชนิดความเสียหายเป็น
+            bludgeoning, piercing หรือ slashing คุณสามารถใช้ Resonance Ability
+            แทน Strength หรือ Dexterity สำหรับ Attack Roll และ Damage Roll ของอาวุธนี้
+          </p>
+
+          <p>
+            คุณสามารถเรียกหรือเก็บอาวุธได้โดยไม่ใช้ Action
+            หากอาวุธอยู่ห่างจากคุณเกิน 5 ฟุตติดต่อกันเป็นเวลา 1 นาที
+            มันจะหายไปและคุณสามารถเรียกกลับมาใหม่ได้
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 1</span>
+          <h4>Astral Path</h4>
+
+          <p>
+            เลือกหนึ่งวิถีจาก Destruction, The Hunt, Erudition, Harmony,
+            Nihility, Preservation, Abundance หรือ Remembrance
+            คุณได้รับ Skill และ Ultimate ของวิถีนั้นทันที
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 2</span>
+          <h4>Traces</h4>
+
+          <p>
+            เลือก Traces สองรายการจากส่วน Traces
+            คุณได้รับ Trace เพิ่มอีกหนึ่งรายการที่ระดับ 6, 10, 14 และ 18
+            คุณเลือก Trace เดิมซ้ำไม่ได้ เว้นแต่ความสามารถจะระบุไว้เป็นอย่างอื่น
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 3</span>
+          <h4>Path Talent</h4>
+
+          <p>
+            คุณได้รับ Talent ประจำวิถี Talent จะมอบความสามารถติดตัว
+            และวิธีสร้าง Energy เพิ่มตามรูปแบบการเล่นของวิถี
+            คุณได้รับ Energy จาก Talent ได้ไม่เกินหนึ่งครั้งต่อรอบ
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 4, 8, 12, 16 และ 19</span>
+          <h4>Ability Score Improvement</h4>
+
+          <p>
+            เพิ่ม Ability Score หนึ่งค่า 2 แต้ม หรือเพิ่ม Ability Score
+            สองค่าอย่างละ 1 แต้ม โดยไม่สามารถเพิ่มค่าเกิน 20
+            หาก DM อนุญาต คุณสามารถเลือก Feat แทนได้
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 5</span>
+          <h4>Extra Attack และ Skill Follow-Up</h4>
+
+          <p>
+            เมื่อใช้ Basic Command คุณสามารถโจมตีสองครั้งแทนหนึ่งครั้ง
+            นอกจากนี้ หลังจากใช้ Skill Command คุณสามารถโจมตีด้วย
+            Resonant Armament ได้หนึ่งครั้ง
+          </p>
+
+          <p>
+            การโจมตีที่ได้รับหลังใช้ Skill ไม่ถือเป็น Basic Command
+            จึงไม่สร้าง Energy และไม่ฟื้น Skill Point
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 6</span>
+          <h4>Magical Armament</h4>
+
+          <p>
+            การโจมตีด้วย Resonant Armament นับเป็นการโจมตีด้วยอาวุธเวทมนตร์
+            สำหรับการเอาชนะ Resistance และ Immunity ต่อการโจมตีที่ไม่ใช่เวทมนตร์
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 7</span>
+          <h4>Path Advancement</h4>
+
+          <p>
+            คุณได้รับความสามารถระดับ 7 จาก Astral Path ที่เลือก
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 9</span>
+          <h4>Skill Amplification</h4>
+
+          <p>
+            เมื่อใช้ Skill คุณสามารถเพิ่ม Resonance Die หนึ่งลูก
+            ให้กับความเสียหาย การรักษา หรือ Temporary HP
+            ที่ Skill มอบให้กับเป้าหมายหนึ่งตัว
+          </p>
+
+          <p>
+            หาก Skill ไม่มีผลลัพธ์ดังกล่าว ให้เลือกหนึ่งเป้าหมายของ Skill
+            เป้าหมายนั้นเพิ่ม Resonance Die ให้กับ d20 roll ครั้งถัดไป
+            ก่อนจบเทิร์นถัดไปของมัน
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 11</span>
+          <h4>Resonant Impact</h4>
+
+          <p>
+            หนึ่งครั้งต่อเทิร์น เมื่อ Basic Attack หรือ Skill ของคุณสร้างความเสียหาย
+            คุณสามารถเพิ่ม Resonance Die หนึ่งลูกให้กับความเสียหายหนึ่งครั้ง
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 13</span>
+          <h4>Energy Overflow</h4>
+
+          <p>
+            เมื่อทอย Initiative หากคุณมี Energy ต่ำกว่า 3 หน่วย
+            ให้เพิ่ม Energy เป็น 3 หน่วยแทน 2 หน่วย
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 15</span>
+          <h4>Path Apex</h4>
+
+          <p>
+            คุณได้รับความสามารถระดับ 15 จาก Astral Path ที่เลือก
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 17</span>
+          <h4>Skill Mastery</h4>
+
+          <p>
+            Skill แรกที่คุณใช้ในการต่อสู้แต่ละครั้งไม่เสีย Skill Point
+            แต่ยังสร้าง Energy และทำงานตามกฎปกติ
+          </p>
+        </div>
+
+        <div class="feature">
+          <span class="level">ระดับ 20</span>
+          <h4>Emanator’s Awakening</h4>
+
+          <p>
+            เมื่อทอย Initiative คุณเริ่มต้นด้วย Energy 5 หน่วย
+            และมี Skill Points เต็มจำนวน
+          </p>
+
+          <p>
+            หลังจากใช้ Ultimate คุณได้รับ Energy คืน 2 หน่วย
+            ความสามารถนี้ไม่ทำให้คุณใช้ Ultimate ได้มากกว่าหนึ่งครั้งต่อรอบ
+          </p>
+        </div>
+      </section>
+
+      <section id="paths" class="major-section">
+        <h2>6. วิถีแห่งดวงดาว</h2>
+
+        <p class="lead">
+          Astral Path กำหนดบทบาทหลัก Skill, Ultimate, Talent
+          และความสามารถระดับสูงของตัวละคร
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>วิถี</th>
+                <th>บทบาท</th>
+                <th>จุดเด่น</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Destruction</td>
+                <td>Bruiser</td>
+                <td>แนวหน้า โจมตีหลายเป้าหมาย และแข็งแกร่งขึ้นเมื่อบาดเจ็บ</td>
+              </tr>
+              <tr>
+                <td>The Hunt</td>
+                <td>Single-Target DPS</td>
+                <td>สร้างความเสียหายสูงแก่เป้าหมายเดี่ยวและไล่ล่าศัตรู</td>
+              </tr>
+              <tr>
+                <td>Erudition</td>
+                <td>Area DPS</td>
+                <td>โจมตีศัตรูจำนวนมากและควบคุมพื้นที่</td>
+              </tr>
+              <tr>
+                <td>Harmony</td>
+                <td>Support</td>
+                <td>เพิ่มความสามารถและการเคลื่อนที่ให้พันธมิตร</td>
+              </tr>
+              <tr>
+                <td>Nihility</td>
+                <td>Debuffer</td>
+                <td>ลดประสิทธิภาพศัตรูและสร้างผลเสียต่อเนื่อง</td>
+              </tr>
+              <tr>
+                <td>Preservation</td>
+                <td>Tank</td>
+                <td>สร้างโล่ ลดความเสียหาย และปกป้องทีม</td>
+              </tr>
+              <tr>
+                <td>Abundance</td>
+                <td>Healer</td>
+                <td>รักษา ล้างสถานะ และช่วยพันธมิตรที่ล้มลง</td>
+              </tr>
+              <tr>
+                <td>Remembrance</td>
+                <td>Summoner</td>
+                <td>ควบคุมสิ่งอัญเชิญและจำกัดการเคลื่อนไหวศัตรู</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <details id="destruction" open>
+          <summary>
+            <span class="path-heading">
+              <span class="path-icon">✹</span>
+              Destruction — วิถีแห่งการทำลายล้าง
+            </span>
+          </summary>
+
+          <div class="details-body">
+            <p>
+              นักรบแนวหน้าที่แลกความปลอดภัยกับพลังโจมตี
+              เหมาะกับผู้เล่นที่ต้องการอยู่กลางสนามรบ
+              กระจายความเสียหาย และได้รับประโยชน์เมื่อพลังชีวิตลดลง
+            </p>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — โบนัสประจำวิถี</span>
+              <h4>Destructive Vitality</h4>
+              <p>
+                HP สูงสุดของคุณเพิ่มขึ้น 1 ต่อทุกระดับที่มีในคลาสผู้ก้าววิถีดารา
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Skill</span>
+              <h4>Ruinous Cleave</h4>
+              <p>
+                ใช้ Skill Point 1 หน่วยและโจมตีด้วย Resonant Armament หนึ่งครั้ง
+                เมื่อโจมตีโดน เป้าหมายรับความเสียหายตามปกติ
+                บวก Resonance Die 1 ลูก
+              </p>
+
+              <p>
+                เลือกศัตรูอีกหนึ่งตัวภายใน 10 ฟุตจากเป้าหมายแรก
+                ศัตรูตัวนั้นรับความเสียหายประเภทเดียวกันเท่ากับ
+                Resonance Die + Resonance Ability modifier
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Ultimate</span>
+              <h4>Stellar Cataclysm</h4>
+              <p>
+                ศัตรูที่คุณเลือกทุกตัวในรัศมี 15 ฟุตรอบตัว
+                ต้องทอย Dexterity Saving Throw
+              </p>
+
+              <p>
+                เป้าหมายที่ไม่ผ่านรับความเสียหายประเภทเดียวกับ
+                Resonant Armament เท่ากับ 3 Resonance Dice
+                + Resonance Ability modifier
+                เป้าหมายที่ผ่านรับความเสียหายครึ่งหนึ่ง
+              </p>
+
+              <p>
+                หลังจากนั้น คุณได้รับ Temporary HP เท่ากับ 2 Resonance Dice
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 3 — Talent</span>
+              <h4>Crisis Engine</h4>
+              <p>
+                เมื่อคุณได้รับความเสียหายจากศัตรู
+                หรือทำให้ศัตรูลดเหลือ 0 HP คุณได้รับ Energy 1 หน่วย
+                โดยยังอยู่ภายใต้ข้อจำกัด Energy จาก Talent
+                ไม่เกินหนึ่งครั้งต่อรอบ
+              </p>
+
+              <p>
+                ขณะที่ HP ของคุณไม่เกินครึ่งหนึ่งของ HP สูงสุด
+                ความเสียหายครั้งแรกที่คุณสร้างในแต่ละเทิร์น
+                เพิ่มขึ้นอีก 1 Resonance Die
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 7 — Path Advancement</span>
+              <h4>Refuse to Fall</h4>
+              <p>
+                ครั้งแรกในแต่ละรอบที่คุณได้รับความเสียหาย
+                ขณะที่ HP ไม่เกินครึ่งหนึ่งของ HP สูงสุด
+                ลดความเสียหายนั้นลงเท่ากับ
+                Proficiency Bonus + Resonance Ability modifier
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 15 — Path Apex</span>
+              <h4>Total Destruction</h4>
+              <p>
+                Ruinous Cleave สามารถสร้างความเสียหายแก่ศัตรูข้างเคียง
+                ได้สูงสุดสองตัวแทนหนึ่งตัว
+              </p>
+
+              <p>
+                ขณะที่ HP ของคุณไม่เกินครึ่งหนึ่งของ HP สูงสุด
+                Attack Roll ที่เกิดจาก Skill หรือ Ultimate
+                เป็น Critical Hit เมื่อผลบน d20 เท่ากับ 19 หรือ 20
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <details id="hunt" open>
+          <summary>
+            <span class="path-heading">
+              <span class="path-icon">➶</span>
+              The Hunt — วิถีแห่งการล่าสังหาร
+            </span>
+          </summary>
+
+          <div class="details-body">
+            <p>
+              นักล่าที่เชี่ยวชาญการกำจัดเป้าหมายสำคัญอย่างรวดเร็ว
+              เหมาะกับการต่อสู้กับบอส ศัตรูระดับสูง
+              และเป้าหมายที่แยกตัวออกจากกลุ่ม
+            </p>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — โบนัสประจำวิถี</span>
+              <h4>Hunter’s Training</h4>
+              <p>
+                ได้รับ proficiency ใน Perception หรือ Survival
+                หากมี proficiency ในทั้งสองทักษะแล้ว
+                เลือกหนึ่งในสองทักษะเพื่อรับ Expertise แทน
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Skill</span>
+              <h4>Perfect Pursuit</h4>
+              <p>
+                ใช้ Skill Point 1 หน่วย เลือกเป้าหมายหนึ่งตัวในระยะอาวุธ
+                และโจมตีด้วย Resonant Armament โดยมี Advantage
+              </p>
+
+              <p>
+                เมื่อโจมตีโดน เป้าหมายรับความเสียหายตามปกติ
+                บวก 2 Resonance Dice
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Ultimate</span>
+              <h4>Sever the Stars</h4>
+              <p>
+                โจมตีเป้าหมายหนึ่งตัวในระยะ Resonant Armament โดยมี Advantage
+                เมื่อโจมตีโดน เป้าหมายรับความเสียหายตามปกติ
+                บวก 4 Resonance Dice
+              </p>
+
+              <p>
+                การโจมตีนี้เป็น Critical Hit เมื่อผลบน d20 เท่ากับ 19 หรือ 20
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 3 — Talent</span>
+              <h4>Chosen Quarry</h4>
+              <p>
+                เมื่อคุณสร้างความเสียหายแก่ศัตรู
+                คุณสามารถทำเครื่องหมายเป้าหมายนั้นจนจบเทิร์นถัดไปของคุณ
+                คุณมีเป้าหมายที่ถูกทำเครื่องหมายได้ครั้งละหนึ่งตัว
+              </p>
+
+              <p>
+                เมื่อโจมตีเป้าหมายที่ถูกทำเครื่องหมาย
+                และไม่มีศัตรูตัวอื่นอยู่ภายใน 5 ฟุตจากเป้าหมาย
+                คุณได้รับ Energy 1 หน่วย
+                และเคลื่อนที่ได้ทันที 10 ฟุตโดยไม่กระตุ้น Opportunity Attack
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 7 — Path Advancement</span>
+              <h4>Relentless Follow-Up</h4>
+              <p>
+                เมื่อเป้าหมายที่ถูกทำเครื่องหมายโจมตีพันธมิตรของคุณ
+                หรือเคลื่อนที่ออกห่างจากคุณ
+                คุณสามารถใช้ Reaction เพื่อโจมตีเป้าหมายนั้น
+                ด้วย Resonant Armament หนึ่งครั้ง
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 15 — Path Apex</span>
+              <h4>Predator’s Certainty</h4>
+              <p>
+                Perfect Pursuit และ Sever the Stars เป็น Critical Hit
+                เมื่อผลบน d20 เท่ากับ 18–20
+              </p>
+
+              <p>
+                หากการโจมตีจาก Perfect Pursuit พลาด
+                คุณได้รับ Skill Point ที่ใช้ไปคืน
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <details id="erudition" open>
+          <summary>
+            <span class="path-heading">
+              <span class="path-icon">⌘</span>
+              Erudition — วิถีแห่งปัญญา
+            </span>
+          </summary>
+
+          <div class="details-body">
+            <p>
+              ผู้คำนวณสนามรบที่เชี่ยวชาญการโจมตีศัตรูจำนวนมาก
+              เหมาะกับการจัดการฝูงศัตรูและสร้างพื้นที่อันตรายในสนามรบ
+            </p>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — โบนัสประจำวิถี</span>
+              <h4>Analytical Mind</h4>
+              <p>
+                ได้รับ proficiency ใน Arcana หรือ Investigation
+                หากมี proficiency ในทั้งสองทักษะแล้ว
+                เลือกหนึ่งทักษะเพื่อรับ Expertise แทน
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Skill</span>
+              <h4>Calculated Cascade</h4>
+              <p>
+                ใช้ Skill Point 1 หน่วยและปล่อยพลังเป็นกรวยยาว 15 ฟุต
+                ศัตรูทุกตัวในพื้นที่ต้องทอย Dexterity Saving Throw
+              </p>
+
+              <p>
+                เป้าหมายที่ไม่ผ่านรับความเสียหายประเภทเดียวกับ
+                Resonant Armament เท่ากับ 2 Resonance Dice
+                + Resonance Ability modifier
+                เป้าหมายที่ผ่านรับความเสียหายครึ่งหนึ่ง
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Ultimate</span>
+              <h4>Celestial Equation</h4>
+              <p>
+                เลือกจุดหนึ่งที่มองเห็นในระยะ 90 ฟุต
+                ศัตรูที่คุณเลือกในรัศมี 20 ฟุตจากจุดนั้น
+                ต้องทอย Dexterity Saving Throw
+              </p>
+
+              <p>
+                เป้าหมายที่ไม่ผ่านรับความเสียหายเท่ากับ
+                4 Resonance Dice + Resonance Ability modifier
+                เป้าหมายที่ผ่านรับความเสียหายครึ่งหนึ่ง
+                ความเสียหายเป็นชนิดเดียวกับ Resonant Armament
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 3 — Talent</span>
+              <h4>Chain of Insight</h4>
+              <p>
+                เมื่อ Skill หรือ Ultimate ของคุณสร้างความเสียหาย
+                แก่ศัตรูอย่างน้อยสองตัว
+                คุณได้รับ Energy 1 หน่วย
+              </p>
+
+              <p>
+                เลือกหนึ่งในเป้าหมายเหล่านั้น
+                ความเร็วของมันลดลง 10 ฟุต
+                จนถึงช่วงเริ่มเทิร์นถัดไปของคุณ
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 7 — Path Advancement</span>
+              <h4>Selective Calculation</h4>
+              <p>
+                พันธมิตรของคุณไม่ได้รับผลจากพื้นที่ของ Skill และ Ultimate
+              </p>
+
+              <p>
+                เมื่อใช้ Calculated Cascade
+                คุณสามารถเลือกสร้างพื้นที่เป็นกรวยยาว 20 ฟุต
+                หรือเส้นตรงยาว 30 ฟุตและกว้าง 5 ฟุต
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 15 — Path Apex</span>
+              <h4>Infinite Solution</h4>
+              <p>
+                เมื่อศัตรูอย่างน้อยสองตัวไม่ผ่าน Saving Throw
+                ต่อ Skill หรือ Ultimate ของคุณ
+                เลือกหนึ่งในเป้าหมายเหล่านั้นให้รับความเสียหายเพิ่ม
+                2 Resonance Dice
+              </p>
+
+              <p>
+                เป้าหมายที่เลือกไม่สามารถใช้ Reaction
+                จนจบเทิร์นถัดไปของมัน
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <details id="harmony" open>
+          <summary>
+            <span class="path-heading">
+              <span class="path-icon">♫</span>
+              Harmony — วิถีแห่งการประสาน
+            </span>
+          </summary>
+
+          <div class="details-body">
+            <p>
+              ผู้สนับสนุนที่เสริมพลังและจัดตำแหน่งให้สมาชิกในทีม
+              เหมาะกับผู้เล่นที่ต้องการสร้างโอกาสให้เพื่อน
+              และควบคุมจังหวะของการต่อสู้
+            </p>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — โบนัสประจำวิถี</span>
+              <h4>Harmonious Presence</h4>
+              <p>
+                ได้รับ proficiency ใน Performance หรือ Persuasion
+                หากมี proficiency ในทั้งสองทักษะแล้ว
+                เลือกหนึ่งทักษะเพื่อรับ Expertise แทน
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Skill</span>
+              <h4>Accelerating Melody</h4>
+              <p>
+                ใช้ Skill Point 1 หน่วยและเลือกพันธมิตรหนึ่งตัว
+                ที่มองเห็นในระยะ 60 ฟุต
+                เป้าหมายเคลื่อนที่ได้ทันทีไม่เกินครึ่งหนึ่งของความเร็ว
+                โดยไม่กระตุ้น Opportunity Attack
+              </p>
+
+              <p>
+                ก่อนเริ่มเทิร์นถัดไปของคุณ
+                เป้าหมายสามารถเพิ่ม Resonance Die ให้กับ d20 roll หนึ่งครั้ง
+                และเพิ่ม Resonance Die ให้กับความเสียหาย
+                หรือการรักษาหนึ่งครั้ง
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Ultimate</span>
+              <h4>Grand Constellation</h4>
+              <p>
+                เลือกพันธมิตรที่มองเห็นในระยะ 60 ฟุต
+                ได้สูงสุดเท่ากับ Proficiency Bonus ของคุณ
+              </p>
+
+              <p>
+                แต่ละเป้าหมายเคลื่อนที่ได้ทันทีไม่เกินครึ่งหนึ่งของความเร็ว
+                โดยไม่กระตุ้น Opportunity Attack
+              </p>
+
+              <p>
+                ก่อนจบเทิร์นถัดไปของคุณ
+                แต่ละเป้าหมายสามารถเพิ่ม Resonance Die
+                ให้กับ d20 roll หนึ่งครั้ง
+                และเพิ่ม Resonance Die ให้กับความเสียหายครั้งถัดไป
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 3 — Talent</span>
+              <h4>Perfect Tempo</h4>
+              <p>
+                เมื่อพันธมิตรที่ได้รับผลจาก Skill หรือ Ultimate ของคุณ
+                โจมตีโดนหรือผ่าน Saving Throw
+                คุณได้รับ Energy 1 หน่วย
+                โดยอยู่ภายใต้ข้อจำกัดหนึ่งครั้งต่อรอบ
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 7 — Path Advancement</span>
+              <h4>Duet of Heroes</h4>
+              <p>
+                Accelerating Melody สามารถเลือกพันธมิตรได้สองตัวแทนหนึ่งตัว
+                แต่มีเพียงหนึ่งเป้าหมายที่สามารถเคลื่อนที่ได้ทันที
+              </p>
+
+              <p>
+                เป้าหมายทั้งสองยังได้รับโบนัส Resonance Die ตามปกติ
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 15 — Path Apex</span>
+              <h4>Encore Beyond Time</h4>
+              <p>
+                เมื่อใช้ Grand Constellation
+                เลือกหนึ่งเป้าหมายของ Ultimate
+                เป้าหมายนั้นสามารถใช้ Reaction เพื่อทำหนึ่งในตัวเลือกต่อไปนี้:
+                โจมตีด้วยอาวุธหนึ่งครั้ง ใช้ Dash ใช้ Disengage หรือใช้ Use an Object
+              </p>
+
+              <p>
+                ผลโบนัสของ Grand Constellation คงอยู่
+                จนจบเทิร์นถัดไปของคุณ
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <details id="nihility" open>
+          <summary>
+            <span class="path-heading">
+              <span class="path-icon">◌</span>
+              Nihility — วิถีแห่งอนัตตา
+            </span>
+          </summary>
+
+          <div class="details-body">
+            <p>
+              ผู้ควบคุมสนามรบที่ทำให้ศัตรูอ่อนแอและผิดพลาด
+              เหมาะกับผู้เล่นที่ต้องการลดความสามารถของศัตรู
+              มากกว่าสร้างความเสียหายโดยตรงเพียงอย่างเดียว
+            </p>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — โบนัสประจำวิถี</span>
+              <h4>Void-Touched Insight</h4>
+              <p>
+                ได้รับ proficiency ใน Deception หรือ Insight
+                หากมี proficiency ในทั้งสองทักษะแล้ว
+                เลือกหนึ่งทักษะเพื่อรับ Expertise แทน
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Skill</span>
+              <h4>Collapse Potential</h4>
+              <p>
+                ใช้ Skill Point 1 หน่วยและเลือกสิ่งมีชีวิตหนึ่งตัวในระยะ 90 ฟุต
+                เป้าหมายต้องทอย Wisdom Saving Throw
+              </p>
+
+              <p>
+                หากไม่ผ่าน เป้าหมายรับ psychic damage เท่ากับ
+                2 Resonance Dice + Resonance Ability modifier
+                และต้องลบ Resonance Die หนึ่งลูก
+                ออกจาก Attack Roll หรือ Saving Throw ครั้งถัดไป
+                ก่อนจบเทิร์นถัดไปของมัน
+              </p>
+
+              <p>
+                หากผ่าน เป้าหมายรับความเสียหายครึ่งหนึ่ง
+                และไม่ถูกลดผลการทอย
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Ultimate</span>
+              <h4>Event Horizon</h4>
+              <p>
+                เลือกจุดหนึ่งที่มองเห็นในระยะ 90 ฟุต
+                ศัตรูที่คุณเลือกในรัศมี 20 ฟุตจากจุดนั้น
+                ต้องทอย Wisdom Saving Throw
+              </p>
+
+              <p>
+                หากไม่ผ่าน เป้าหมายรับ psychic damage เท่ากับ
+                3 Resonance Dice + Resonance Ability modifier
+                ความเร็วลดลงครึ่งหนึ่ง ไม่สามารถใช้ Reaction
+                และต้องลบ Resonance Die หนึ่งลูก
+                ออกจาก Saving Throw ครั้งถัดไป
+                จนจบเทิร์นถัดไปของมัน
+              </p>
+
+              <p>
+                หากผ่าน เป้าหมายรับความเสียหายครึ่งหนึ่ง
+                และไม่ได้รับผลเสียอื่น
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 3 — Talent</span>
+              <h4>Entropic Return</h4>
+              <p>
+                เมื่อศัตรูที่อยู่ภายใต้ผลเสียจากความสามารถของคุณ
+                โจมตีพลาดหรือไม่ผ่าน Saving Throw
+                คุณได้รับ Energy 1 หน่วย
+                โดยอยู่ภายใต้ข้อจำกัดหนึ่งครั้งต่อรอบ
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 7 — Path Advancement</span>
+              <h4>Lingering Decay</h4>
+              <p>
+                ครั้งแรกในแต่ละเทิร์นที่ศัตรูซึ่งไม่ผ่าน Saving Throw
+                ต่อ Skill หรือ Ultimate ของคุณเริ่มเทิร์น
+                มันได้รับ psychic damage เท่ากับ Resonance Die 1 ลูก
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 15 — Path Apex</span>
+              <h4>Absolute Null</h4>
+              <p>
+                เป้าหมายที่ไม่ผ่าน Saving Throw ต่อ Collapse Potential
+                ไม่สามารถฟื้น HP และมี AC ลดลง 2
+                จนถึงช่วงเริ่มเทิร์นถัดไปของคุณ
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <details id="preservation" open>
+          <summary>
+            <span class="path-heading">
+              <span class="path-icon">◆</span>
+              Preservation — วิถีแห่งการอนุรักษ์
+            </span>
+          </summary>
+
+          <div class="details-body">
+            <p>
+              ผู้พิทักษ์ที่สร้างโล่ ลดความเสียหาย
+              และช่วยให้สมาชิกในทีมยืนหยัดอยู่ในสนามรบ
+            </p>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — โบนัสประจำวิถี</span>
+              <h4>Guardian Training</h4>
+              <p>
+                คุณได้รับ proficiency ในโล่และเกราะหนัก
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Skill</span>
+              <h4>Aegis Matrix</h4>
+              <p>
+                ใช้ Skill Point 1 หน่วยและเลือกสิ่งมีชีวิตหนึ่งตัว
+                ที่มองเห็นในระยะ 30 ฟุต
+              </p>
+
+              <p>
+                เป้าหมายได้รับ Temporary HP เท่ากับ
+                2 Resonance Dice + Resonance Ability modifier
+                Temporary HP นี้คงอยู่จนหมดหรือจนจบ Short Rest
+              </p>
+
+              <p>
+                ขณะที่เป้าหมายยังมี Temporary HP จากความสามารถนี้
+                เป้าหมายได้รับโบนัส +1 AC
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Ultimate</span>
+              <h4>Unbroken Firmament</h4>
+              <p>
+                พันธมิตรที่คุณเลือกทุกตัวในรัศมี 30 ฟุต
+                ได้รับ Temporary HP เท่ากับ
+                3 Resonance Dice + Resonance Ability modifier
+              </p>
+
+              <p>
+                แต่ละเป้าหมายมี Resistance ต่อความเสียหายครั้งแรก
+                ที่ได้รับก่อนจบเทิร์นถัดไปของคุณ
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 3 — Talent</span>
+              <h4>Shielded Resolve</h4>
+              <p>
+                เมื่อ Temporary HP ที่คุณสร้างให้สิ่งมีชีวิตอื่น
+                รับความเสียหายจากศัตรู
+                คุณได้รับ Energy 1 หน่วย
+                โดยอยู่ภายใต้ข้อจำกัดหนึ่งครั้งต่อรอบ
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 7 — Path Advancement</span>
+              <h4>Interception Field</h4>
+              <p>
+                เมื่อพันธมิตรภายใน 30 ฟุต
+                ซึ่งมี Temporary HP ที่คุณสร้างได้รับความเสียหาย
+                คุณสามารถใช้ Reaction เพื่อลดความเสียหายนั้น
+                เท่ากับ Resonance Die + Resonance Ability modifier
+              </p>
+
+              <p>
+                หลังลดความเสียหาย คุณสามารถเคลื่อนที่เข้าหาพันธมิตร
+                ได้ไม่เกิน 10 ฟุตโดยไม่กระตุ้น Opportunity Attack
+                จากผู้โจมตี
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 15 — Path Apex</span>
+              <h4>Last Bastion</h4>
+              <p>
+                หนึ่งครั้งต่อ Long Rest
+                เมื่อพันธมิตรภายใน 30 ฟุตกำลังจะมี HP ลดเหลือ 0
+                คุณทำให้เป้าหมายเหลือ 1 HP แทน
+              </p>
+
+              <p>
+                เป้าหมายได้รับ Temporary HP เท่ากับ
+                3 Resonance Dice โดยคุณไม่ต้องใช้ Action หรือ Reaction
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <details id="abundance" open>
+          <summary>
+            <span class="path-heading">
+              <span class="path-icon">✚</span>
+              Abundance — วิถีแห่งความอุดมสมบูรณ์
+            </span>
+          </summary>
+
+          <div class="details-body">
+            <p>
+              ผู้รักษาที่ช่วยประคองทีม ล้างสถานะผิดปกติ
+              และดึงพันธมิตรกลับมาจากภาวะใกล้พ่ายแพ้
+            </p>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — โบนัสประจำวิถี</span>
+              <h4>Healer’s Knowledge</h4>
+              <p>
+                ได้รับ proficiency ใน Medicine
+                หากมี proficiency อยู่แล้ว คุณได้รับ Expertise แทน
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Skill</span>
+              <h4>Restorative Pulse</h4>
+              <p>
+                ใช้ Skill Point 1 หน่วยและเลือกสิ่งมีชีวิตหนึ่งตัว
+                ที่มองเห็นในระยะ 60 ฟุต
+              </p>
+
+              <p>
+                เป้าหมายฟื้น HP เท่ากับ
+                2 Resonance Dice + Resonance Ability modifier
+                สิ่งมีชีวิตหนึ่งตัวรับการรักษาจาก Skill นี้
+                ได้ไม่เกินหนึ่งครั้งต่อเทิร์น
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Ultimate</span>
+              <h4>Garden of Renewal</h4>
+              <p>
+                เลือกสิ่งมีชีวิตที่มองเห็นในระยะ 60 ฟุต
+                ได้สูงสุดเท่ากับ Proficiency Bonus ของคุณ
+              </p>
+
+              <p>
+                แต่ละเป้าหมายฟื้น HP เท่ากับ
+                3 Resonance Dice + Resonance Ability modifier
+                และยุติหนึ่งสถานะจาก charmed, frightened หรือ poisoned
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 3 — Talent</span>
+              <h4>Overflowing Life</h4>
+              <p>
+                เมื่อคุณรักษาสิ่งมีชีวิตที่มี HP
+                ไม่เกินครึ่งหนึ่งของ HP สูงสุด
+                คุณได้รับ Energy 1 หน่วย
+                โดยอยู่ภายใต้ข้อจำกัดหนึ่งครั้งต่อรอบ
+              </p>
+
+              <p>
+                การรักษาที่เกิน HP สูงสุดของเป้าหมาย
+                สามารถเปลี่ยนเป็น Temporary HP
+                ได้สูงสุดเท่ากับผลทอย Resonance Die 1 ลูก
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 7 — Path Advancement</span>
+              <h4>Purifying Current</h4>
+              <p>
+                เมื่อใช้ Restorative Pulse
+                คุณสามารถยุติหนึ่งสถานะจาก
+                charmed, frightened หรือ poisoned บนเป้าหมาย
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 15 — Path Apex</span>
+              <h4>Life Beyond Defeat</h4>
+              <p>
+                หนึ่งครั้งต่อ Long Rest
+                เมื่อพันธมิตรภายใน 60 ฟุตมี HP ลดเหลือ 0
+                คุณสามารถใช้ Reaction เพื่อทำให้เป้าหมายฟื้น HP
+                เท่ากับ 3 Resonance Dice + Resonance Ability modifier
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <details id="remembrance" open>
+          <summary>
+            <span class="path-heading">
+              <span class="path-icon">❉</span>
+              Remembrance — วิถีแห่งความทรงจำ
+            </span>
+          </summary>
+
+          <div class="details-body">
+            <p>
+              ผู้ใช้พลังแห่งความทรงจำซึ่งเรียก Memory Echo
+              ออกมาช่วยต่อสู้ เหมาะกับผู้เล่นที่ชอบสิ่งอัญเชิญ
+              การควบคุมพื้นที่ และการแบ่งหน้าที่ระหว่างตัวละครสองร่าง
+            </p>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — โบนัสประจำวิถี</span>
+              <h4>Keeper of Memory</h4>
+              <p>
+                ได้รับ proficiency ใน History หรือ Arcana
+                หากมี proficiency ในทั้งสองทักษะแล้ว
+                เลือกหนึ่งทักษะเพื่อรับ Expertise แทน
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1</span>
+              <h4>Memory Echo</h4>
+
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>ขนาด</th>
+                      <td>Small</td>
+                    </tr>
+                    <tr>
+                      <th>ประเภท</th>
+                      <td>Construct, Spirit หรือประเภทอื่นตามธีมโดยได้รับอนุญาตจาก DM</td>
+                    </tr>
+                    <tr>
+                      <th>Armor Class</th>
+                      <td>13 + Proficiency Bonus</td>
+                    </tr>
+                    <tr>
+                      <th>Hit Points</th>
+                      <td>5 + 4 เท่าของระดับคลาสผู้ก้าววิถีดารา</td>
+                    </tr>
+                    <tr>
+                      <th>ความเร็ว</th>
+                      <td>30 ฟุต</td>
+                    </tr>
+                    <tr>
+                      <th>Saving Throws</th>
+                      <td>ใช้โบนัส Saving Throw ของคุณ</td>
+                    </tr>
+                    <tr>
+                      <th>Initiative</th>
+                      <td>เคลื่อนที่และทำงานหลังเทิร์นของคุณ</td>
+                    </tr>
+                    <tr>
+                      <th>เมื่อไม่มีคำสั่ง</th>
+                      <td>ใช้ Dodge action</td>
+                    </tr>
+                    <tr>
+                      <th>เมื่อ HP เหลือ 0</th>
+                      <td>หายไปจนจบ Short Rest หรือจนถูกเรียกคืนด้วย Skill</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Skill</span>
+              <h4>Echo Manifestation</h4>
+              <p>
+                ใช้ Skill Point 1 หน่วยเพื่อเรียก Memory Echo
+                ในพื้นที่ว่างที่มองเห็นภายใน 30 ฟุต
+                หาก Memory Echo ปรากฏตัวอยู่แล้ว
+                คุณสามารถฟื้น HP ให้มันเท่ากับ 2 Resonance Dice แทน
+              </p>
+
+              <p>
+                หลังจากนั้น Memory Echo โจมตีเป้าหมายหนึ่งตัวในระยะ 30 ฟุต
+                โดยใช้ Skill Attack Modifier ของคุณ
+                เมื่อโจมตีโดน เป้าหมายรับ cold หรือ psychic damage
+                เท่ากับ 2 Resonance Dice + Resonance Ability modifier
+              </p>
+
+              <p>
+                เลือกชนิดความเสียหายเมื่อได้รับวิถีนี้
+                และใช้ชนิดที่เลือกกับความสามารถของ Memory Echo
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 1 — Ultimate</span>
+              <h4>Frozen Recollection</h4>
+              <p>
+                Memory Echo ปลดปล่อยพลังในรัศมี 15 ฟุตรอบตัว
+                ศัตรูที่คุณเลือกในพื้นที่ต้องทอย Wisdom Saving Throw
+              </p>
+
+              <p>
+                เป้าหมายที่ไม่ผ่านรับ cold หรือ psychic damage
+                เท่ากับ 3 Resonance Dice + Resonance Ability modifier
+                และมีความเร็วเป็น 0 จนจบเทิร์นถัดไปของมัน
+              </p>
+
+              <p>
+                เป้าหมายที่ผ่านรับความเสียหายครึ่งหนึ่ง
+                และความเร็วไม่เปลี่ยนแปลง
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 3 — Talent</span>
+              <h4>Living Memory</h4>
+              <p>
+                ครั้งแรกในแต่ละรอบที่ Memory Echo โจมตีโดน
+                หรือมีศัตรูไม่ผ่าน Saving Throw ต่อ Frozen Recollection
+                คุณได้รับ Energy 1 หน่วย
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 7 — Path Advancement</span>
+              <h4>Independent Thought</h4>
+              <p>
+                เมื่อคุณใช้ Basic Command
+                คุณสามารถใช้ Bonus Action เพื่อสั่ง Memory Echo
+                ให้โจมตีสิ่งมีชีวิตหนึ่งตัวในระยะ 30 ฟุต
+              </p>
+
+              <p>
+                การโจมตีนี้ใช้ Skill Attack Modifier
+                และสร้างความเสียหายเท่ากับ
+                Resonance Die + Resonance Ability modifier
+              </p>
+            </div>
+
+            <div class="feature">
+              <span class="level">ระดับ 15 — Path Apex</span>
+              <h4>Perfect Recollection</h4>
+              <p>
+                Memory Echo มี Resistance ต่อความเสียหายทุกชนิด
+              </p>
+
+              <p>
+                เมื่อคุณใช้ Frozen Recollection
+                Memory Echo สามารถโจมตีสิ่งมีชีวิตหนึ่งตัว
+                ที่ไม่ผ่าน Saving Throw ต่อ Ultimate ได้ทันที
+                โดยไม่ต้องใช้ Action หรือ Bonus Action เพิ่มเติม
+              </p>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="traces" class="major-section">
+        <h2>7. Traces</h2>
+
+        <p>
+          ที่ระดับ 2 คุณเลือก Traces สองรายการ
+          และได้รับ Trace เพิ่มอีกหนึ่งรายการที่ระดับ 6, 10, 14 และ 18
+          คุณไม่สามารถเลือก Trace เดิมซ้ำ เว้นแต่ Trace จะระบุไว้เป็นอย่างอื่น
+        </p>
+
+        <div class="grid">
+          <div class="info-card">
+            <h3>Astral Mobility</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 2</p>
+            <p>
+              ความเร็วของคุณเพิ่มขึ้น 10 ฟุต
+              และระยะกระโดดไกลกับกระโดดสูงเพิ่มเป็นสองเท่า
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Cosmic Archive</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 2</p>
+            <p>
+              เลือกหนึ่งทักษะที่คุณมี proficiency
+              คุณได้รับ Expertise ในทักษะนั้น
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Universal Translator</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 2</p>
+            <p>
+              เรียนรู้ภาษาเพิ่มเติมสามภาษา
+              และสามารถร่าย <em>Comprehend Languages</em>
+              แบบ Ritual โดยไม่ใช้ Spell Slot
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Weakness Scan</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 2</p>
+            <p>
+              ใช้ Bonus Action เพื่อวิเคราะห์สิ่งมีชีวิตหนึ่งตัว
+              ที่มองเห็นในระยะ 60 ฟุต
+            </p>
+            <p>
+              DM เปิดเผย Resistance, Immunity หรือ Vulnerability
+              ของเป้าหมายหนึ่งรายการ หากมันมี
+              ใช้ได้เท่ากับ Proficiency Bonus ต่อ Long Rest
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Technique Reserve</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 2</p>
+            <p>
+              Skill Point สูงสุดของคุณเพิ่มขึ้น 1 หน่วย
+              เลือก Trace นี้ได้เพียงครั้งเดียว
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Stellar Endurance</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 2</p>
+            <p>
+              ได้รับ proficiency ใน Strength หรือ Wisdom Saving Throw
+              อย่างใดอย่างหนึ่ง
+            </p>
+            <p>
+              คุณไม่สามารถเลือก Trace นี้ได้
+              หาก Multiclass เข้าสู่คลาสผู้ก้าววิถีดาราภายหลัง
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Field Medic</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 2</p>
+            <p>
+              คุณสามารถใช้ Healer’s Kit เป็น Bonus Action
+              และผู้รับฟื้น HP เพิ่มเท่ากับ Resonance Ability modifier
+            </p>
+            <p>
+              สิ่งมีชีวิตแต่ละตัวรับผลจาก Trace นี้
+              ได้หนึ่งครั้งต่อ Short Rest
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Phase Step</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 6</p>
+            <p>
+              ใช้ Bonus Action เพื่อเทเลพอร์ตไปยังพื้นที่ว่าง
+              ที่มองเห็นภายใน 15 ฟุต
+            </p>
+            <p>
+              ใช้ได้เท่ากับ Proficiency Bonus ต่อ Long Rest
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Break Protocol</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 6</p>
+            <p>
+              หนึ่งครั้งต่อเทิร์น เมื่อศัตรูไม่ผ่าน Saving Throw
+              ต่อ Skill ของคุณ เป้าหมายไม่สามารถใช้ Reaction
+              จนถึงช่วงเริ่มเทิร์นถัดไปของมัน
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Follow-Up Calibration</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 10</p>
+            <p>
+              เมื่อคุณโจมตีด้วย Reaction
+              เพิ่ม Resonance Die หนึ่งลูกให้กับความเสียหายของการโจมตีนั้น
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Dimensional Stability</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 10</p>
+            <p>
+              คุณมี Advantage ต่อ Saving Throw
+              เพื่อหลีกเลี่ยงหรือยุติสถานะ charmed และ frightened
+            </p>
+            <p>
+              คุณยังมี Advantage ต่อการตรวจสอบหรือ Saving Throw
+              เพื่อหลีกเลี่ยงการถูกเคลื่อนย้ายโดยไม่สมัครใจ
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Path Resonance</h3>
+            <p><strong>ระดับขั้นต่ำ:</strong> 14</p>
+            <p>
+              เลือกความเสียหายหนึ่งชนิดจาก acid, cold, fire,
+              lightning, necrotic, psychic, radiant หรือ thunder
+            </p>
+            <p>
+              ความเสียหายจาก Skill และ Ultimate ของคุณ
+              เพิกเฉยต่อ Resistance ต่อชนิดที่เลือก
+              แต่ไม่สามารถเพิกเฉยต่อ Immunity
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="multiclass">
+        <h2>8. กฎ Multiclass</h2>
+
+        <h3>ข้อกำหนดค่าสถานะ</h3>
+
+        <p>
+          การ Multiclass เข้าหรือออกจากคลาสผู้ก้าววิถีดารา
+          ต้องมี Strength หรือ Dexterity อย่างน้อย 13
+          และ Resonance Ability ที่เลือกอย่างน้อย 13
+        </p>
+
+        <h3>Proficiency ที่ได้รับ</h3>
+
+        <p>
+          เมื่อ Multiclass เข้าสู่คลาสนี้
+          คุณได้รับ proficiency ในเกราะเบา เกราะกลาง อาวุธธรรมดา
+          และหนึ่งทักษะจากรายการทักษะของคลาส
+        </p>
+
+        <p>
+          คุณไม่ได้รับ Saving Throw proficiency
+          อุปกรณ์เริ่มต้น หรือ Martial Weapon proficiency เพิ่มเติม
+        </p>
+
+        <h3>Resonant Armament</h3>
+
+        <p>
+          Resonant Armament ใช้กับความสามารถของคลาสนี้ได้ตามปกติ
+          แต่ไม่ถือเป็น Pact Weapon, Monk Weapon
+          หรืออาวุธพิเศษประเภทอื่นโดยอัตโนมัติ
+          เว้นแต่ความสามารถที่เกี่ยวข้องจะรองรับมันอย่างชัดเจน
+        </p>
+
+        <h3>Extra Attack</h3>
+
+        <p>
+          Extra Attack จากคลาสนี้ไม่เพิ่มจำนวนการโจมตี
+          ร่วมกับ Extra Attack จากคลาสอื่น
+          ให้ใช้กฎ Multiclass ของ D&amp;D 5e ตามปกติ
+        </p>
+
+        <h3>Skill Points และ Energy</h3>
+
+        <p>
+          จำนวน Skill Points, Resonance Die และความสามารถที่เกี่ยวข้อง
+          คำนวณจากระดับในคลาสผู้ก้าววิถีดาราเท่านั้น
+        </p>
+
+        <div class="callout">
+          <p>
+            <strong>คำแนะนำสำหรับ DM:</strong>
+            หากการผสมคลาสสร้าง Energy หรือฟื้น Skill Point
+            โดยไม่ต้องเผชิญความเสี่ยงจริง
+            ให้ใช้ข้อจำกัดหนึ่งครั้งต่อเทิร์น
+            และเงื่อนไข “ภัยคุกคามจริง” อย่างเคร่งครัด
+          </p>
+        </div>
+      </section>
+
+      <section id="examples">
+        <h2>9. ตัวอย่างการเล่น</h2>
+
+        <h3>ตัวอย่างวงจรการต่อสู้ระดับ 5</h3>
+
+        <p>
+          เมื่อเริ่มการต่อสู้ ตัวละครระดับ 5 มี Skill Points สูงสุด 3 หน่วย
+          และเริ่มต้นด้วย Energy อย่างน้อย 2 หน่วย
+        </p>
+
+        <div class="feature">
+          <h4>รอบที่ 1: ใช้ Skill</h4>
+          <p>
+            ตัวละครใช้ Action และ Skill Point 1 หน่วยเพื่อเปิดใช้ Skill
+            จากนั้นได้รับ Energy 2 หน่วย ทำให้มี Energy รวม 4 หน่วย
+          </p>
+
+          <p>
+            หลัง Skill จบ ตัวละครโจมตีด้วย Resonant Armament
+            หนึ่งครั้งจาก Skill Follow-Up
+            การโจมตีนี้ไม่สร้าง Energy และไม่ฟื้น Skill Point
+          </p>
+        </div>
+
+        <div class="feature">
+          <h4>เมื่อ Talent ทำงาน</h4>
+          <p>
+            หากเงื่อนไขของ Path Talent เกิดขึ้นในรอบเดียวกัน
+            ตัวละครได้รับ Energy อีก 1 หน่วย
+            ทำให้มี Energy ครบ 5 หน่วยและพร้อมใช้ Ultimate
+          </p>
+        </div>
+
+        <div class="feature">
+          <h4>ใช้ Ultimate นอกเทิร์น</h4>
+          <p>
+            ตัวละครสามารถรอจนศัตรูจบเทิร์น
+            แล้วใช้ Reaction เพื่อเปิดใช้ Ultimate
+            หรือใช้เป็น Bonus Action ในเทิร์นของตนเอง
+          </p>
+        </div>
+
+        <div class="feature">
+          <h4>รอบที่ 2: ฟื้นทรัพยากร</h4>
+          <p>
+            ตัวละครใช้ Basic Command และโจมตีสองครั้งจาก Extra Attack
+            หากอย่างน้อยหนึ่งครั้งโจมตีโดน
+            ตัวละครได้รับ Energy 1 หน่วยและฟื้น Skill Point 1 หน่วย
+          </p>
+        </div>
+
+        <div class="callout success">
+          <p>
+            <strong>ผลด้านเกมเพลย์:</strong>
+            ผู้เล่นต้องเลือกระหว่างการใช้ Skill เพื่อเร่งจังหวะ
+            กับการใช้ Basic Command เพื่อฟื้นทรัพยากร
+            ทำให้คลาสมีความสามารถสูงโดยไม่สามารถใช้ท่าที่แรงที่สุด
+            ได้อย่างต่อเนื่องโดยไม่มีช่วงพัก
+          </p>
+        </div>
+
+        <h3>ตัวอย่างตัวละคร OC</h3>
+
+        <div class="grid">
+          <div class="info-card">
+            <p class="stat-line"><span class="stat-label">ชื่อ:</span> Lyra Vesper</p>
+            <p class="stat-line"><span class="stat-label">วิถี:</span> Harmony</p>
+            <p class="stat-line"><span class="stat-label">Resonance Ability:</span> Charisma</p>
+            <p class="stat-line"><span class="stat-label">Resonant Armament:</span> ไวโอลินที่สร้างคมมีดจากคลื่นเสียง</p>
+          </div>
+
+          <div class="info-card">
+            <p class="stat-line"><span class="stat-label">Skill:</span> Overture of Tomorrow</p>
+            <p class="stat-line"><span class="stat-label">กลไก:</span> ใช้กฎเดียวกับ Accelerating Melody</p>
+            <p class="stat-line"><span class="stat-label">Ultimate:</span> A Sky Written in Song</p>
+            <p class="stat-line"><span class="stat-label">กลไก:</span> ใช้กฎเดียวกับ Grand Constellation</p>
+          </div>
+        </div>
+
+        <p>
+          เมื่อ Lyra ใช้ความสามารถ โน้ตดนตรีและกลุ่มดาวจะปรากฏรอบตัวพันธมิตร
+          การเปลี่ยนชื่อ รูปลักษณ์ เสียง และคำบรรยายไม่มีผลต่อกลไก
+          จึงสามารถออกแบบตัวละครให้โดดเด่นได้โดยไม่ทำลายสมดุล
+        </p>
+      </section>
+
+      <section id="balance">
+        <h2>10. แนวทางทดสอบสมดุล</h2>
+
+        <p>
+          คลาสนี้ควรได้รับการทดลองเล่นก่อนใช้ในแคมเปญระยะยาว
+          โดยเฉพาะหากกลุ่มใช้ Feat, Magic Item
+          หรือกฎเสริมที่เพิ่มจำนวน Reaction และ Action
+        </p>
+
+        <div class="grid">
+          <div class="info-card">
+            <h3>ดาเมจพื้นฐาน</h3>
+            <p>
+              Extra Attack ให้การโจมตีสูงสุดสองครั้ง
+              และ Resonant Impact เพิ่มความเสียหายเพียงหนึ่งครั้งต่อเทิร์น
+              จึงไม่ควรแทนที่ Fighter ด้านการโจมตีต่อเนื่อง
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Ultimate</h3>
+            <p>
+              Ultimate มีพลังมากกว่า Skill ชัดเจน
+              แต่ต้องสะสม Energy และอาจแย่ง Reaction
+              กับความสามารถป้องกันหรือ Follow-Up
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>การรักษาและโล่</h3>
+            <p>
+              การรักษาและสร้าง Temporary HP ใช้ Skill Point
+              และไม่สามารถฟื้นทรัพยากรจากการโจมตีสิ่งของ
+              จึงช่วยป้องกันการรักษาแบบไม่จำกัด
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>การ Multiclass</h3>
+            <p>
+              Resonant Armament ใช้ค่าสายจิตได้
+              แต่ความสามารถหลัก เช่น Extra Attack, Resonant Impact
+              และ Skill Mastery ต้องลงทุนหลายระดับ
+            </p>
+          </div>
+        </div>
+
+        <h3>เป้าหมายในการ Playtest</h3>
+
+        <p>
+          ในการต่อสู้ประมาณ 4 รอบ ตัวละครควรใช้ Ultimate ได้ประมาณ 1–2 ครั้ง
+          หากใช้ได้ 3 ครั้งขึ้นไปเป็นประจำโดยไม่เสียโอกาสสำคัญ
+          การสร้าง Energy อาจสูงเกินไป
+        </p>
+
+        <h3>หากคลาสแรงเกินไป</h3>
+
+        <p>
+          ลดความเสียหายหรือการรักษาของ Ultimate ลง 1 Resonance Die
+          หรือกำหนดว่า Talent ไม่สามารถสร้าง Energy
+          ในรอบเดียวกับที่ตัวละครใช้ Ultimate
+        </p>
+
+        <h3>หากคลาสอ่อนเกินไป</h3>
+
+        <p>
+          ให้ Basic Command สร้าง Energy 1 หน่วยแม้การโจมตีทั้งหมดพลาด
+          แต่ยังคงกำหนดให้ต้องโจมตีภัยคุกคามจริง
+          อีกทางหนึ่งคือเพิ่ม Skill Point สูงสุดอีก 1 หน่วย
+        </p>
+
+        <h3>ระดับที่แนะนำสำหรับการทดสอบ</h3>
+
+        <p>
+          ระดับ 5 และระดับ 8 เหมาะสำหรับเริ่ม Playtest
+          เพราะระบบ Basic, Skill, Extra Attack, Talent และ Ultimate
+          เริ่มทำงานร่วมกันอย่างครบถ้วนแล้ว
+        </p>
+      </section>
+
+      <section id="quick-reference" class="major-section">
+        <h2>11. สรุปกฎฉบับรวดเร็ว</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>สิ่งที่ต้องการทำ</th>
+                <th>กฎที่ใช้</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td><strong>โจมตีและฟื้นทรัพยากร</strong></td>
+                <td>
+                  ใช้ Basic Command หากโจมตีโดนอย่างน้อยหนึ่งครั้ง
+                  ได้ Energy 1 และฟื้น Skill Point 1
+                </td>
+              </tr>
+              <tr>
+                <td><strong>ใช้ Skill</strong></td>
+                <td>
+                  ใช้ Action และ Skill Point 1 หน่วย
+                  หลัง Skill ทำงานได้รับ Energy 2
+                </td>
+              </tr>
+              <tr>
+                <td><strong>ใช้ Ultimate</strong></td>
+                <td>
+                  ใช้ Energy 5 เป็น Bonus Action ในเทิร์นตัวเอง
+                  หรือ Reaction หลังสิ่งมีชีวิตจบเทิร์น
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Skill Save DC</strong></td>
+                <td>
+                  8 + Proficiency Bonus + Resonance Ability modifier
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Skill Attack</strong></td>
+                <td>
+                  Proficiency Bonus + Resonance Ability modifier
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Energy จาก Talent</strong></td>
+                <td>
+                  ได้ไม่เกิน 1 หน่วยต่อรอบ
+                </td>
+              </tr>
+              <tr>
+                <td><strong>จำกัด Ultimate</strong></td>
+                <td>
+                  ใช้ได้ไม่เกินหนึ่งครั้งต่อรอบ
+                </td>
+              </tr>
+              <tr>
+                <td><strong>ฟื้น Skill Points</strong></td>
+                <td>
+                  กลับมาเต็มเมื่อทอย Initiative ต่อภัยคุกคามจริง
+                  หรือเมื่อจบ Short Rest หรือ Long Rest
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Energy หลังการต่อสู้</strong></td>
+                <td>
+                  หายทั้งหมดเมื่อไม่มีภัยคุกคามเป็นเวลา 1 นาที
+                </td>
+              </tr>
+              <tr>
+                <td><strong>ป้องกันการฟาร์ม</strong></td>
+                <td>
+                  การโจมตีสิ่งของ พันธมิตร
+                  หรือเป้าหมายที่สมัครใจไม่สร้างทรัพยากร
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>ลำดับการเล่นที่ควรจำ</h3>
+
+        <div class="checklist">
+          <div class="check-item">เริ่มการต่อสู้ด้วย Skill Points เต็ม และ Energy อย่างน้อย 2</div>
+          <div class="check-item">ใช้ Basic Command เพื่อฟื้น Skill Point และสร้าง Energy</div>
+          <div class="check-item">ใช้ Skill Point เพื่อเปิดใช้ Skill และรับ Energy 2</div>
+          <div class="check-item">ตรวจสอบว่า Path Talent สร้าง Energy ได้หรือไม่</div>
+          <div class="check-item">เมื่อ Energy ครบ 5 เลือกจังหวะใช้ Ultimate</div>
+          <div class="check-item">จำไว้ว่า Ultimate ใช้ได้ไม่เกินหนึ่งครั้งต่อรอบ</div>
+        </div>
+      </section>
+
+      <section id="character-record">
+        <h2>12. ช่องบันทึกตัวละคร</h2>
+
+        <div class="sheet">
+          <div class="field">
+            <span class="field-label">ชื่อตัวละคร</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">ระดับคลาส</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Astral Path</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Resonance Ability</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Skill Save DC</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Skill Attack Modifier</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Skill Points สูงสุด</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Resonance Die</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field large">
+            <span class="field-label">Resonant Armament และชนิดความเสียหาย</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field large">
+            <span class="field-label">Skill</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field large">
+            <span class="field-label">Ultimate</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field large">
+            <span class="field-label">Talent</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field large">
+            <span class="field-label">Traces</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+
+          <div class="field large">
+            <span class="field-label">คำอธิบายพลังและธีมของ OC</span>
+            <span class="write-line">&nbsp;</span>
+          </div>
+        </div>
+
+        <h3>Energy Tracker</h3>
+
+        <div class="resource-track">
+          <span class="resource-box">0</span>
+          <span class="resource-box">1</span>
+          <span class="resource-box">2</span>
+          <span class="resource-box">3</span>
+          <span class="resource-box">4</span>
+          <span class="resource-box">5</span>
+        </div>
+
+        <h3>Skill Point Tracker</h3>
+
+        <div class="resource-track">
+          <span class="resource-box">1</span>
+          <span class="resource-box">2</span>
+          <span class="resource-box">3</span>
+          <span class="resource-box">4</span>
+          <span class="resource-box">5</span>
+          <span class="resource-box">6</span>
+          <span class="resource-box">7</span>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>
+          Astral Pathstrider — คลาส Homebrew สำหรับ D&amp;D 5e
+          สร้างขึ้นเพื่อใช้กับตัวละคร OC และการทดลองเล่นในกลุ่มส่วนตัว
+        </p>
+
+        <p>
+          ชื่อและเครื่องหมายการค้าที่เกี่ยวข้องเป็นทรัพย์สินของเจ้าของตามกฎหมาย
+          เอกสารนี้เป็นผลงานแฟนเมดที่ไม่เป็นทางการ
+        </p>
+
+        <a class="back-to-top" href="#top">กลับขึ้นด้านบน ↑</a>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    /*
+      ฟังก์ชันสลับโหมดสว่างและโหมดมืด
+      บันทึกตัวเลือกไว้ในเบราว์เซอร์
+    */
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+
+      const selectedTheme =
+        document.body.classList.contains("dark") ? "dark" : "light";
+
+      localStorage.setItem("astral-pathstrider-theme", selectedTheme);
+    }
+
+    /*
+      เปิดหรือปิดรายละเอียดของทุก Astral Path
+    */
+    function setAllDetails(openState) {
+      document.querySelectorAll("details").forEach(function (detail) {
+        detail.open = openState;
+      });
+    }
+
+    /*
+      โหลดธีมเดิมเมื่อเปิดหน้าเอกสารอีกครั้ง
+    */
+    const savedTheme = localStorage.getItem("astral-pathstrider-theme");
+
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
+
+    /*
+      เปิดรายละเอียดทั้งหมดก่อนพิมพ์หรือบันทึก PDF
+    */
+    let printDetailStates = [];
+
+    window.addEventListener("beforeprint", function () {
+      printDetailStates = [];
+
+      document.querySelectorAll("details").forEach(function (detail) {
+        printDetailStates.push(detail.open);
+        detail.open = true;
+      });
+    });
+
+    /*
+      คืนสถานะรายละเอียดหลังพิมพ์เสร็จ
+    */
+    window.addEventListener("afterprint", function () {
+      document.querySelectorAll("details").forEach(function (detail, index) {
+        detail.open = printDetailStates[index];
+      });
+    });
+  </script>
+
+</body>
 </html>
